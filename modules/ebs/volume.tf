@@ -11,9 +11,9 @@ resource "aws_ebs_volume" "volume" {
   availability_zone = "${var.zone}"
   size              = 40
 
-  encrypted = "true"
+  encrypted = "false"
 
   tags {
-    Name = "HelloWorld"
+    Name = "HelloWorld2"
   }
 }
