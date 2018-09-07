@@ -1,7 +1,6 @@
 package plan
 
 import (
-	"fmt"
 	"github.com/hashicorp/terraform/terraform"
 	"os"
 	"testing"
@@ -19,13 +18,11 @@ func TestIsDestroyedCreate(t *testing.T) {
 		t.Errorf("unexpected error %v", err)
 	}
 
-	isDestroyed, resourceName := IsDestroyingEBSVolume(plan)
+	isDestroyed, _ := IsDestroyingEBSVolume(plan)
 
 	if isDestroyed != false {
 		t.Errorf("unexpected value exp=%+v\n act=%+v\n", false, true)
 	}
-
-	fmt.Println(resourceName)
 }
 
 func TestIsDestroyedTainted(t *testing.T) {
@@ -40,13 +37,12 @@ func TestIsDestroyedTainted(t *testing.T) {
 		t.Errorf("unexpected error %v", err)
 	}
 
-	isDestroyed, resourceName := IsDestroyingEBSVolume(plan)
+	isDestroyed, _ := IsDestroyingEBSVolume(plan)
 
-	if isDestroyed != false {
+	if isDestroyed != true {
 		t.Errorf("unexpected value exp=%+v\n act=%+v\n", false, true)
 	}
 
-	fmt.Println(resourceName)
 }
 
 func TestIsDestroyedModify(t *testing.T) {
@@ -61,13 +57,12 @@ func TestIsDestroyedModify(t *testing.T) {
 		t.Errorf("unexpected error %v", err)
 	}
 
-	isDestroyed, resourceName := IsDestroyingEBSVolume(plan)
+	isDestroyed, _ := IsDestroyingEBSVolume(plan)
 
 	if isDestroyed != false {
 		t.Errorf("unexpected value exp=%+v\n act=%+v\n", false, true)
 	}
 
-	fmt.Println(resourceName)
 }
 
 func TestIsDestroyedDestroy(t *testing.T) {
@@ -82,13 +77,11 @@ func TestIsDestroyedDestroy(t *testing.T) {
 		t.Errorf("unexpected error %v", err)
 	}
 
-	isDestroyed, resourceName := IsDestroyingEBSVolume(plan)
+	isDestroyed, _ := IsDestroyingEBSVolume(plan)
 
-	if isDestroyed != false {
+	if isDestroyed != true {
 		t.Errorf("unexpected value exp=%+v\n act=%+v\n", false, true)
 	}
-
-	fmt.Println(resourceName)
 }
 
 func TestIsDestroyedRecreate(t *testing.T) {
@@ -103,13 +96,12 @@ func TestIsDestroyedRecreate(t *testing.T) {
 		t.Errorf("unexpected error %v", err)
 	}
 
-	isDestroyed, resourceName := IsDestroyingEBSVolume(plan)
+	isDestroyed, _ := IsDestroyingEBSVolume(plan)
 
-	if isDestroyed != false {
+	if isDestroyed != true {
 		t.Errorf("unexpected value exp=%+v\n act=%+v\n", false, true)
 	}
 
-	fmt.Println(resourceName)
 }
 func TestIsDestroyedNochanges(t *testing.T) {
 	// testing if the resources are deleted when i create plan is applied.
@@ -123,11 +115,10 @@ func TestIsDestroyedNochanges(t *testing.T) {
 		t.Errorf("unexpected error %v", err)
 	}
 
-	isDestroyed, resourceName := IsDestroyingEBSVolume(plan)
+	isDestroyed, _ := IsDestroyingEBSVolume(plan)
 
 	if isDestroyed != false {
 		t.Errorf("unexpected value exp=%+v\n act=%+v\n", false, true)
 	}
 
-	fmt.Println(resourceName)
 }

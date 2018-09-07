@@ -14,6 +14,6 @@ resource "aws_ebs_volume" "volume" {
   encrypted = "false"
 
   tags {
-    Name = "HelloWorld2"
+    Name = "HelloWorld4"
   }
 }
