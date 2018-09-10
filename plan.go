@@ -1,7 +1,6 @@
 package plan
 
 import (
-	//	"fmt"
 	"github.com/hashicorp/terraform/terraform"
 	"strings"
 )
@@ -25,8 +24,10 @@ func IsDestroyingEBSVolume(pl *terraform.Plan) (bool, []string) {
 			//	fmt.Printf("%s: %+v %+v\n", key, resource.ChangeType(), resource.Attributes)
 			switch resource.ChangeType() {
 			case DiffDestroy, DiffDestroyCreate:
-				resourceNames = append(resourceNames, strings.SplitAfter(key, ":")[0])
-				isDestroyed = true
+				if strings.Contains(strings.SplitAfter(key, ":")[0], "aws_ebs") {
+					resourceNames = append(resourceNames, strings.SplitAfter(key, ":")[0])
+					isDestroyed = true
+				}
 			}
 		}
 	}
