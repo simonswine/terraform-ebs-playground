@@ -28,61 +28,61 @@ func openReadPlan(t *testing.T, testCase string) *terraform.Plan {
 }
 
 func TestIsDestroyedCreate(t *testing.T) {
-	isDestroyed, resourceName := IsDestroyingEBSVolume(openReadPlan(t, "create.plan"))
+	isDestroyed, resourceNames := IsDestroyingEBSVolume(openReadPlan(t, "create.plan"))
 
 	if exp, act := false, isDestroyed; exp != act {
 		t.Errorf("unexpected value exp=%+v\n act=%+v\n", exp, act)
 	}
 
-	if len(resourceName) != 0 {
-		t.Errorf("unexpected resourceName returned %+v", resourceName)
+	if len(resourceNames) != 0 {
+		t.Errorf("unexpected resourceNames returned %+v", resourceNames)
 	}
 
 }
 
 func TestIsDestroyedTainted(t *testing.T) {
-	isDestroyed, resourceName := IsDestroyingEBSVolume(openReadPlan(t, "tainted.plan"))
+	isDestroyed, resourceNames := IsDestroyingEBSVolume(openReadPlan(t, "tainted.plan"))
 
 	if exp, act := true, isDestroyed; exp != act {
 		t.Errorf("unexpected value exp=%+v\n act=%+v\n", exp, act)
 	}
 
-	if len(resourceName) != 1 {
-		t.Errorf("unexpected resourceName returned %+v", resourceName)
+	if len(resourceNames) != 1 {
+		t.Errorf("unexpected resourceNames returned %+v", resourceNames)
 	}
 
-	if exp, act := []string{"module.etcd.aws_ebs_volume.volume.0"}, resourceName; !reflect.DeepEqual(exp, act) {
+	if exp, act := []string{"module.etcd.aws_ebs_volume.volume.0"}, resourceNames; !reflect.DeepEqual(exp, act) {
 		t.Errorf("unexpected slice exp=%+v act=%+v", exp, act)
 	}
 
 }
 
 func TestIsDestroyedModify(t *testing.T) {
-	isDestroyed, resourceName := IsDestroyingEBSVolume(openReadPlan(t, "modify.plan"))
+	isDestroyed, resourceNames := IsDestroyingEBSVolume(openReadPlan(t, "modify.plan"))
 
 	if exp, act := false, isDestroyed; exp != act {
 		t.Errorf("unexpected value exp=%+v\n act=%+v\n", exp, act)
 	}
 
-	if len(resourceName) != 0 {
-		t.Errorf("unexpected resourceName returned %+v", resourceName)
+	if len(resourceNames) != 0 {
+		t.Errorf("unexpected resourceNames returned %+v", resourceNames)
 	}
 
 }
 
 func TestIsDestroyedDestroy(t *testing.T) {
-	isDestroyed, resourceName := IsDestroyingEBSVolume(openReadPlan(t, "destroy.plan"))
+	isDestroyed, resourceNames := IsDestroyingEBSVolume(openReadPlan(t, "destroy.plan"))
 
 	if exp, act := true, isDestroyed; exp != act {
 		t.Errorf("unexpected value exp=%+v\n act=%+v\n", exp, act)
 	}
 
-	if len(resourceName) != 3 {
-		t.Errorf("unexpected resourceName returned %+v", resourceName)
+	if len(resourceNames) != 3 {
+		t.Errorf("unexpected resourceNames returned %+v", resourceNames)
 
 	}
 
-	for _, resource := range resourceName {
+	for _, resource := range resourceNames {
 		if _, ok := expResources[resource]; ok {
 			expResources[resource] = true
 		} else {
@@ -92,17 +92,17 @@ func TestIsDestroyedDestroy(t *testing.T) {
 }
 
 func TestIsDestroyedRecreate(t *testing.T) {
-	isDestroyed, resourceName := IsDestroyingEBSVolume(openReadPlan(t, "recreate.plan"))
+	isDestroyed, resourceNames := IsDestroyingEBSVolume(openReadPlan(t, "recreate.plan"))
 
 	if exp, act := true, isDestroyed; exp != act {
 		t.Errorf("unexpected value exp=%+v\n act=%+v\n", exp, act)
 	}
 
-	if len(resourceName) != 3 {
-		t.Errorf("expected resourceName returned %+v", resourceName)
+	if len(resourceNames) != 3 {
+		t.Errorf("expected resourceNames returned %+v", resourceNames)
 	}
 
-	for _, resource := range resourceName {
+	for _, resource := range resourceNames {
 		if _, ok := expResources[resource]; ok {
 			expResources[resource] = true
 		} else {
@@ -113,26 +113,26 @@ func TestIsDestroyedRecreate(t *testing.T) {
 }
 
 func TestIsDestroyedNochanges(t *testing.T) {
-	isDestroyed, resourceName := IsDestroyingEBSVolume(openReadPlan(t, "nochanges.plan"))
+	isDestroyed, resourceNames := IsDestroyingEBSVolume(openReadPlan(t, "nochanges.plan"))
 
 	if exp, act := false, isDestroyed; exp != act {
 		t.Errorf("unexpected value exp=%+v\n act=%+v\n", exp, act)
 	}
 
-	if len(resourceName) != 0 {
-		t.Errorf("expected resourceName returned %+v", resourceName)
+	if len(resourceNames) != 0 {
+		t.Errorf("expected resourceNames returned %+v", resourceNames)
 	}
 }
 
 func TestIsDestroyedNonEbs(t *testing.T) {
-	isDestroyed, resourceName := IsDestroyingEBSVolume(openReadPlan(t, "destroy_non_ebs.plan"))
+	isDestroyed, resourceNames := IsDestroyingEBSVolume(openReadPlan(t, "destroy_non_ebs.plan"))
 
 	if exp, act := false, isDestroyed; exp != act {
 		t.Errorf("unexpected value exp=%+v\n act=%+v\n", exp, act)
 	}
 
-	if len(resourceName) != 0 {
-		t.Errorf("expected resourceName returned %+v", resourceName)
+	if len(resourceNames) != 0 {
+		t.Errorf("expected resourceNames returned %+v", resourceNames)
 	}
 
 }
