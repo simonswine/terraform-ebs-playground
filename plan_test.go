@@ -3,19 +3,25 @@ package plan
 import (
 	"github.com/hashicorp/terraform/terraform"
 	"os"
-	"strings"
+	"reflect"
 	"testing"
 )
+
+var expResources = map[string]bool{
+	"module.etcd.aws_ebs_volume.volume.0": false,
+	"module.etcd.aws_ebs_volume.volume.1": false,
+	"module.etcd.aws_ebs_volume.volume.2": false,
+}
 
 func openReadPlan(t *testing.T, testCase string) *terraform.Plan {
 	file, err := os.Open(testCase)
 	if err != nil {
-		t.Errorf("unexpected error %v", err)
+		t.Fatalf("unexpected error %v", err)
 	}
 
 	plan, err := terraform.ReadPlan(file)
 	if err != nil {
-		t.Errorf("unexpected error %v", err)
+		t.Fatalf("unexpected error %v", err)
 	}
 
 	return plan
@@ -29,7 +35,7 @@ func TestIsDestroyedCreate(t *testing.T) {
 	}
 
 	if len(resourceName) != 0 {
-		t.Errorf("unexpected value")
+		t.Errorf("unexpected resourceName returned %+v", resourceName)
 	}
 
 }
@@ -41,14 +47,12 @@ func TestIsDestroyedTainted(t *testing.T) {
 		t.Errorf("unexpected value exp=%+v\n act=%+v\n", exp, act)
 	}
 
-	if len(resourceName) == 0 {
-		t.Errorf("unexpected value no resource to add")
+	if len(resourceName) != 1 {
+		t.Errorf("unexpected resourceName returned %+v", resourceName)
 	}
 
-	for _, resource := range resourceName {
-		if strings.Split(resource, ".")[0] != "aws_ebs_volume" {
-			t.Errorf("expected ebs resource but recieved=%s", resource)
-		}
+	if exp, act := []string{"module.etcd.aws_ebs_volume.volume.0"}, resourceName; !reflect.DeepEqual(exp, act) {
+		t.Errorf("unexpected slice exp=%+v act=%+v", exp, act)
 	}
 
 }
@@ -61,7 +65,7 @@ func TestIsDestroyedModify(t *testing.T) {
 	}
 
 	if len(resourceName) != 0 {
-		t.Errorf("unexpected value")
+		t.Errorf("unexpected resourceName returned %+v", resourceName)
 	}
 
 }
@@ -73,16 +77,18 @@ func TestIsDestroyedDestroy(t *testing.T) {
 		t.Errorf("unexpected value exp=%+v\n act=%+v\n", exp, act)
 	}
 
-	if len(resourceName) == 0 {
-		t.Errorf("unexpected value")
+	if len(resourceName) != 3 {
+		t.Errorf("unexpected resourceName returned %+v", resourceName)
+
 	}
 
 	for _, resource := range resourceName {
-		if strings.Split(resource, ".")[0] != "aws_ebs_volume" {
-			t.Errorf("expected ebs resource but received=%s", resource)
+		if _, ok := expResources[resource]; ok {
+			expResources[resource] = true
+		} else {
+			t.Errorf("unexpected slice act=%+v", resource)
 		}
 	}
-
 }
 
 func TestIsDestroyedRecreate(t *testing.T) {
@@ -92,13 +98,15 @@ func TestIsDestroyedRecreate(t *testing.T) {
 		t.Errorf("unexpected value exp=%+v\n act=%+v\n", exp, act)
 	}
 
-	if len(resourceName) == 0 {
-		t.Errorf("expected value")
+	if len(resourceName) != 3 {
+		t.Errorf("expected resourceName returned %+v", resourceName)
 	}
 
 	for _, resource := range resourceName {
-		if strings.Split(resource, ".")[0] != "aws_ebs_volume" {
-			t.Errorf("expected ebs resource but received=%s", resource)
+		if _, ok := expResources[resource]; ok {
+			expResources[resource] = true
+		} else {
+			t.Errorf("unexpected slice  act=%+v", resource)
 		}
 	}
 
@@ -112,7 +120,7 @@ func TestIsDestroyedNochanges(t *testing.T) {
 	}
 
 	if len(resourceName) != 0 {
-		t.Errorf("unexpected value")
+		t.Errorf("expected resourceName returned %+v", resourceName)
 	}
 }
 
@@ -124,7 +132,7 @@ func TestIsDestroyedNonEbs(t *testing.T) {
 	}
 
 	if len(resourceName) != 0 {
-		t.Errorf("unexpected value")
+		t.Errorf("expected resourceName returned %+v", resourceName)
 	}
 
 }
