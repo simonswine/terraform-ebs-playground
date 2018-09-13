@@ -1,16 +1,21 @@
 package plan
 
 import (
-	"github.com/hashicorp/terraform/terraform"
 	"os"
 	"reflect"
 	"testing"
+
+	"github.com/hashicorp/terraform/terraform"
 )
 
-var expResources = map[string]bool{
-	"module.etcd.aws_ebs_volume.volume.0": false,
-	"module.etcd.aws_ebs_volume.volume.1": false,
-	"module.etcd.aws_ebs_volume.volume.2": false,
+func expResources() map[string]bool {
+
+	return map[string]bool{
+		"module.etcd.aws_ebs_volume.volume.0": false,
+		"module.etcd.aws_ebs_volume.volume.1": false,
+		"module.etcd.aws_ebs_volume.volume.2": false,
+	}
+
 }
 
 func openReadPlan(t *testing.T, testCase string) *terraform.Plan {
@@ -83,8 +88,8 @@ func TestIsDestroyedDestroy(t *testing.T) {
 	}
 
 	for _, resource := range resourceNames {
-		if _, ok := expResources[resource]; ok {
-			expResources[resource] = true
+		if found, ok := expResources()[resource]; ok && !found {
+			expResources()[resource] = true
 		} else {
 			t.Errorf("unexpected slice act=%+v", resource)
 		}
@@ -103,8 +108,8 @@ func TestIsDestroyedRecreate(t *testing.T) {
 	}
 
 	for _, resource := range resourceNames {
-		if _, ok := expResources[resource]; ok {
-			expResources[resource] = true
+		if found, ok := expResources()[resource]; ok && !found {
+			expResources()[resource] = true
 		} else {
 			t.Errorf("unexpected slice  act=%+v", resource)
 		}
