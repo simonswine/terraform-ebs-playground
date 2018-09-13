@@ -83,7 +83,7 @@ func TestIsDestroyedDestroy(t *testing.T) {
 	}
 
 	for _, resource := range resourceNames {
-		if _, ok := expResources[resource]; ok {
+		if found, ok := expResources[resource]; ok && !found {
 			expResources[resource] = true
 		} else {
 			t.Errorf("unexpected slice act=%+v", resource)
@@ -103,7 +103,7 @@ func TestIsDestroyedRecreate(t *testing.T) {
 	}
 
 	for _, resource := range resourceNames {
-		if _, ok := expResources[resource]; ok {
+		if found, ok := expResources[resource]; ok && !found {
 			expResources[resource] = true
 		} else {
 			t.Errorf("unexpected slice  act=%+v", resource)
