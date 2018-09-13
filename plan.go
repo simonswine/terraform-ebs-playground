@@ -14,9 +14,12 @@ func IsDestroyingEBSVolume(pl *terraform.Plan) (bool, []string) {
 			switch resource.ChangeType() {
 			case terraform.DiffDestroy, terraform.DiffDestroyCreate:
 				if strings.Split(key, ".")[0] == "aws_ebs_volume" {
-
-					modulePath := "module." + module.Path[1] + "."
-					resourceNames = append(resourceNames, modulePath+key)
+					if module.Path == nil || len(module.Path) == 1 {
+						resourceNames = append(resourceNames, key)
+					} else {
+						modulePath := module.Path[1:len(module.Path)]
+						resourceNames = append(resourceNames, "module."+strings.Join(modulePath, ".")+"."+key)
+					}
 					isDestroyed = true
 				}
 			}

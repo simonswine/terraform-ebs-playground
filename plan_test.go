@@ -136,3 +136,14 @@ func TestIsDestroyedNonEbs(t *testing.T) {
 	}
 
 }
+
+func TestIsDestroyedDestroyNonModuleEbs(t *testing.T) {
+	isDestroyed, resourceNames := IsDestroyingEBSVolume(openReadPlan(t, "destroy_non_module_ebs.plan"))
+
+	if exp, act := true, isDestroyed; exp != act {
+		t.Errorf("unexpected value exp=%+v\n act=%+v\n", exp, act)
+	}
+	if exp, act := []string{"aws_ebs_volume.extra"}, resourceNames; !reflect.DeepEqual(exp, act) {
+		t.Errorf("unexpected slice exp=%+v act=%+v", exp, act)
+	}
+}
